@@ -1,0 +1,21 @@
+version: '2'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: docker-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 32181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 32181:32181
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: docker-kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:32181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:29092
+    ports:
+      - 29092:29092
