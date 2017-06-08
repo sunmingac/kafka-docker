@@ -8,14 +8,42 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - 32181:32181
-  kafka:
+  kafka-0:
     image: confluentinc/cp-kafka:latest
-    container_name: docker-kafka
+    container_name: docker-kafka-0
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 0
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:32181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-0:29092
+      KAFKA_JMX_PORT: 39992
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+    ports:
+      - 29092:29092
+      - 39992:39992
+  kafka-1:
+    image: confluentinc/cp-kafka:latest
+    container_name: docker-kafka-1
     depends_on:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:32181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:29093
+      KAFKA_JMX_PORT: 39993
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
     ports:
-      - 29092:29092
+      - 29093:29093
+      - 39993:39993
+  kafka-manager:
+    image: sheepkiller/kafka-manager
+    container_name: kafka-manager
+    depends_on:
+      - zookeeper
+      - kafka-0
+      - kafka-1
+    environment:
+      ZK_HOSTS: zookeeper:32181
+    ports:
+      - 9000:9000
